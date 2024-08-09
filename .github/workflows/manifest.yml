@@ -1,0 +1,34 @@
+name: Generate Manifest
+
+on:
+  workflow_dispatch:
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+    - uses: actions/checkout@master
+
+    - name: Configure git credentials
+      run: |
+        git config --global user.name "${{ github.actor }}"
+        git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+        git config --global credential.helper store
+        echo "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com" > ~/.git-credentials
+      env:
+        GITHUB_TOKEN: ${{ secrets.PAT }}
+
+    - name: Generate Manifest
+      run: |
+          filename=$(find . -type f -name "*.txt" | sed 's/\.\///g' | sed 's/\.txt//g')
+          echo "filename=$filename" >> "$GITHUB_ENV"
+          rm local_manifest.xml || true
+          bash generate.sh *.txt
+
+    - name: Push to Github Repository
+      run: |
+        git clone https://${{ secrets.PAT }}@github.com/${{ github.actor }}/local_manifest xml
+        mv *.xml xml && cd xml
+        git add .
+        git commit -s -m "manifest: init $filename"
+        git push -f https://${{ secrets.PAT }}@github.com/${{ github.actor }}/local_manifest HEAD:$filename

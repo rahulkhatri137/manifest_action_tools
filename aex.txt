@@ -1,0 +1,8 @@
+{ "https://github.com/lineageOS/android" "lineage-21.0" }
+add "https://github.com/rahulkhatri137/android_prebuilts_clang_host_linux-x86_clang-r353983c1" "prebuilts/clang/host/linux-x86/clang-r353983c1" "twelve"
+tree "https://github.com/rahulkhatri137/android_device_oppo_CPH1859" "device/oppo/CPH1859" "twelve"
+tree "https://github.com/rahulkhatri137/android_kernel_oppo_CPH1859" "kernel/oppo/CPH1859" "twelve"
+tree "https://github.com/rahulkhatri137/android_vendor_oppo_CPH1859" "vendor/oppo/CPH1859" "twelve"
+add "https://github.com/rahulkhatri137/device_mediatek_sepolicy_vndr" "device/mediatek/sepolicy_vndr" "twelve"
+remove "frameworks/base"
+add "https://github.com/rahulkhatri137/platform_frameworks_base" "frameworks/base" "twelve"
