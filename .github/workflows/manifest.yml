@@ -1,0 +1,38 @@
+name: Test Manifest
+
+on:
+  workflow_dispatch:
+    inputs:
+      LOCAL_MANIFEST_URL:
+        description: 'Url of Local Manifest Repo'
+        required: true
+      LOCAL_MANIFEST_BRANCH:
+        description: 'Branch of Local Manifest Repo'
+        required: true
+      ROM_MANIFEST_URL:
+        description: 'Url of ROM Manifest Repo'
+        required: true
+      ROM_MANIFEST_BRANCH:
+        description: 'Branch of ROM Manifest Repo'
+        required: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Install repo
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-core python3-pip wget
+          wget https://storage.googleapis.com/git-repo-downloads/repo && sudo mv repo /usr/bin/repo && sudo chmod a+x /usr/bin/repo
+      - name: Initialize Repo
+        run: |
+          rm -rf .repo/local_manifests
+          repo init --depth=1 -u ${{ github.event.inputs.ROM_MANIFEST_URL }} -b ${{ github.event.inputs.ROM_MANIFEST_BRANCH }} --git-lfs
+          git clone ${{ github.event.inputs.LOCAL_MANIFEST_URL }} -b ${{ github.event.inputs.LOCAL_MANIFEST_BRANCH }}  .repo/local_manifests 
+      - name: Sync Repo
+        timeout-minutes: 2
+        run: repo sync -c --no-clone-bundle --no-tags --optimized-fetch --prune --force-sync
+    strategy:
+        fail-fast: true
